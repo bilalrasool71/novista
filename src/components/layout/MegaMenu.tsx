@@ -43,24 +43,6 @@ const PANEL_WIDTH: Record<MegaPanel, string> = {
 const GUTTER = 16;
 
 /**
- * The shared nav-item treatment: a soft pill fills in behind the label on
- * hover and stays filled for the current section. Exported so the plain links
- * in the header and the dropdown triggers cannot drift apart.
- */
-export function navPillClasses(active: boolean) {
-  return cn(
-    "relative block rounded-full text-[0.9375rem] font-medium whitespace-nowrap",
-    "transition-colors duration-200",
-    "before:absolute before:inset-0 before:-z-10 before:rounded-full",
-    "before:transition-[opacity,transform] before:duration-200 before:ease-out",
-    "before:content-['']",
-    active
-      ? "text-ink before:bg-nav-pill-active before:scale-100 before:opacity-100"
-      : "text-muted hover:text-ink before:bg-nav-pill before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
-  );
-}
-
-/**
  * Keeps a trigger-centred panel inside the window.
  *
  * Centring alone breaks down for the triggers near either end of the nav —
@@ -105,6 +87,7 @@ export function MegaTrigger({
   panel,
   isActive,
   isOpen,
+  lit,
   panelId,
   onOpen,
   onToggle,
@@ -115,6 +98,8 @@ export function MegaTrigger({
   panel: MegaPanel;
   isActive: boolean;
   isOpen: boolean;
+  /** The sliding indicator is currently under this trigger. */
+  lit: boolean;
   panelId: string;
   onOpen: (panel: MegaPanel) => void;
   onToggle: (panel: MegaPanel) => void;
@@ -128,26 +113,15 @@ export function MegaTrigger({
           target, matching the plain links either side of them. */}
       <span
         className={cn(
-          "group/pill relative flex items-center rounded-full",
-          "before:absolute before:inset-0 before:-z-10 before:rounded-full before:content-['']",
-          "before:transition-[opacity,transform] before:duration-200 before:ease-out",
-          isActive
-            ? "before:bg-nav-pill-active before:scale-100 before:opacity-100"
-            : isOpen
-              ? "before:bg-nav-pill before:scale-100 before:opacity-100"
-              : "before:bg-nav-pill before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
+          "relative z-10 flex items-center rounded-full text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
+          lit ? "text-bg" : "text-muted",
         )}
       >
         <Link
           href={href}
           onFocus={() => onOpen(panel)}
           aria-current={isActive ? "page" : undefined}
-          className={cn(
-            "block rounded-full py-2 pr-1 pl-3.5 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
-            isActive || isOpen
-              ? "text-ink"
-              : "text-muted group-hover/pill:text-ink",
-          )}
+          className="block rounded-full py-1.5 pr-0.5 pl-3.5"
         >
           {label}
         </Link>
@@ -158,12 +132,7 @@ export function MegaTrigger({
           aria-controls={panelId}
           aria-label={`${label} menu`}
           onClick={() => onToggle(panel)}
-          className={cn(
-            "grid size-7 place-items-center rounded-full pr-1 transition-colors duration-200",
-            isActive || isOpen
-              ? "text-ink"
-              : "text-muted group-hover/pill:text-ink",
-          )}
+          className="grid size-6 shrink-0 place-items-center rounded-full pr-1"
         >
           <ChevronDown
             aria-hidden="true"
@@ -268,7 +237,7 @@ function ServicesPanel({ onNavigate }: { onNavigate: () => void }) {
             <Link
               href={`/services/${service.slug}`}
               onClick={onNavigate}
-              className="group/item hover:bg-surface-2 flex h-full gap-3.5 rounded-2xl p-3 transition-colors duration-200"
+              className="group/item border-line/0 hover:border-line hover:bg-surface flex h-full gap-3.5 rounded-2xl border p-3 transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
             >
               <span className="border-line bg-surface-2 text-accent-2 group-hover/item:bg-gradient-brand grid size-10 shrink-0 place-items-center rounded-xl border transition-colors duration-300 group-hover/item:border-transparent group-hover/item:text-white">
                 <service.icon aria-hidden="true" className="size-5" />
@@ -318,11 +287,11 @@ function ProductsPanel({ onNavigate }: { onNavigate: () => void }) {
                     <Link
                       href={`/products/${product.slug}`}
                       onClick={onNavigate}
-                      className="group/item text-muted hover:bg-surface-2 hover:text-ink flex items-start gap-2.5 rounded-xl px-2 py-1.5 text-[0.9375rem] leading-snug transition-colors duration-200"
+                      className="group/item text-muted hover:bg-surface-2 hover:text-ink flex items-start gap-2.5 rounded-xl px-2 py-1.5 text-[0.9375rem] leading-snug transition-[background-color,color,transform] duration-200 hover:translate-x-0.5"
                     >
                       <product.icon
                         aria-hidden="true"
-                        className="text-accent-2 mt-0.5 size-4 shrink-0 transition-transform duration-200 group-hover/item:scale-110"
+                        className="text-accent-2 mt-0.5 size-4 shrink-0 transition-[transform,filter] duration-200 group-hover/item:scale-110 group-hover/item:drop-shadow-[0_0_6px_color-mix(in_oklab,var(--color-accent)_70%,transparent)]"
                       />
                       <span>{product.name}</span>
                     </Link>

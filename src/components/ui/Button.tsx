@@ -8,7 +8,12 @@ import { cn } from "@/lib/utils";
  * the brand gradient on hover — so the gradient stays an event rather than
  * background noise.
  */
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "quiet";
+export type ButtonVariant =
+  | "primary"
+  | "brand"
+  | "secondary"
+  | "ghost"
+  | "quiet";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const BASE =
@@ -20,6 +25,10 @@ const BASE =
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
     "bg-ink text-bg hover:bg-gradient-brand hover:text-white hover:shadow-[var(--shadow-glow)]",
+  // Carries brand colour permanently, so the one action in the header is
+  // never mistaken for the nav pill sitting beside it.
+  brand:
+    "bg-gradient-cta text-white hover:bg-right hover:shadow-[var(--shadow-glow)]",
   secondary: "border border-line bg-surface text-ink hover:border-ink card-elev",
   ghost: "text-muted hover:text-ink",
   quiet: "text-ink underline-grow",

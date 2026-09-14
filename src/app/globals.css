@@ -175,7 +175,12 @@
 ------------------------------------------------------------------- */
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Deliberately not `smooth`. The router scrolls to the top on every
+       navigation, and a smooth scroll there animates for half a second while
+       the new page is still settling — any height change in that window cuts
+       it short and strands the reader mid-page. In-page anchors opt into
+       smooth themselves, in components/layout/SmoothAnchors.tsx. */
+    scroll-behavior: auto;
     scroll-padding-top: 6rem;
     -webkit-text-size-adjust: 100%;
     /* `clip` rather than `hidden`. Both stop sideways overflow, but `hidden`
@@ -296,6 +301,23 @@
   animation: novista-gradient-shift 12s ease-in-out infinite;
 }
 
+/**
+ * The call-to-action gradient: the dark half of the brand ramp only.
+ * The full ramp ends at a sky blue that gives white text 1.6:1, which is fine
+ * behind a mark but not behind a label.
+ */
+@utility bg-gradient-cta {
+  background-image: linear-gradient(
+    115deg,
+    var(--color-g1),
+    var(--color-g2) 55%,
+    var(--color-g1)
+  );
+  background-size: 180% 100%;
+  background-position: 0% 50%;
+  transition: background-position 600ms cubic-bezier(0.22, 0.75, 0.2, 1);
+}
+
 @utility bg-gradient-brand {
   background-image: linear-gradient(
     120deg,
@@ -353,31 +375,67 @@
 }
 
 /* ------------------------------------------------------------------
-   Route transitions
-
-   A short crossfade on the page body. Long enough to register as a change of
-   content, short enough that it never delays a click.
-------------------------------------------------------------------- */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 260ms;
-  animation-timing-function: cubic-bezier(0.32, 0.72, 0.28, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-}
-
-/* ------------------------------------------------------------------
    Menu motion
 
    Open/close height is animated with a 0fr -> 1fr grid row rather than
    max-height: it lands on the content's real height, so the panel never
    snaps at the end or eases against a guessed ceiling.
 ------------------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Card hover: a light that follows the cursor
+
+   One compositable layer: a radial wash positioned by the parent's
+   `--spot-x` / `--spot-y`, written by components/ui/Spotlight.tsx. The lit
+   edge is a border colour and a tinted shadow rather than a masked gradient
+   ring — a mask forces its own layer per card, and a page of twelve cards
+   should not pay for twelve of those to get a glow that a shadow already
+   gives.
+------------------------------------------------------------------- */
+@utility spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  background: radial-gradient(
+    18rem circle at var(--spot-x, 50%) var(--spot-y, 0%),
+    color-mix(in oklab, var(--color-accent) 18%, transparent),
+    transparent 62%
+  );
+}
+
+.group:hover > .spotlight,
+.group:focus-within > .spotlight {
+  opacity: 1;
+}
+
+/* Everything the card actually says has to sit above the light. */
+@utility above-spotlight {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight {
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@utility slide-spring {
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.35, 0.5, 1),
+    width 420ms cubic-bezier(0.34, 1.35, 0.5, 1),
+    opacity 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-spring {
+    transition-duration: 0.001ms !important;
+  }
+}
+
 @utility collapsible {
   display: grid;
   grid-template-rows: 0fr;
@@ -589,10 +647,6 @@
    Reduced motion
 ------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {

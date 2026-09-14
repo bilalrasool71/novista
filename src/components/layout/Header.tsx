@@ -9,11 +9,12 @@ import { Logo } from "@/components/layout/Logo";
 import {
   MegaTrigger,
   megaPanelFor,
-  navPillClasses,
   type MegaPanel,
 } from "@/components/layout/MegaMenu";
+import { useNavRail } from "@/components/layout/NavRail";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
 import { productCategories, products } from "@/content/products";
 import { services } from "@/content/services";
 import { cta, primaryNav } from "@/content/site";
@@ -22,14 +23,17 @@ import { useHeaderScroll } from "@/lib/use-header-scroll";
 import { cn } from "@/lib/utils";
 
 /**
- * The header is a floating island rather than a band across the page: it sits
- * inset from every edge with its own border and shadow, so it reads as a
- * control surface over the content instead of a strip of the page that has
- * come loose. On scroll it draws in slightly and firms up its surface.
+ * A flush bar across the top of the page: no inset, no rounding, a hairline
+ * along the bottom and a surface that firms up once the page moves under it.
+ *
+ * The nav is packed against the brand rather than centred. With a full-width
+ * bar, slack on both sides of a centred nav reads as an accident; collecting
+ * all of it on one side reads as a decision, and it puts the dropdowns near
+ * the left edge where they are easiest to reach.
  *
  * On desktop the two sections whose items are pages of their own open a
  * dropdown anchored under their trigger; below `lg` everything collapses into
- * a sheet hanging off the island with the same content behind disclosures.
+ * a sheet below the bar carrying the same content behind disclosures.
  */
 export function Header() {
   const pathname = usePathname();
@@ -131,49 +135,67 @@ export function Header() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
+  const activeIndex = primaryNav.findIndex((item) => isActive(item.href));
+  const {
+    listRef: navListRef,
+    target: litIndex,
+    itemProps: navItemProps,
+    listProps: navListProps,
+    indicatorProps,
+  } = useNavRail(activeIndex);
+
   const settled = scrolled || sheetOpen || mega !== null;
 
   return (
     <header
       ref={headerRef}
       onMouseLeave={leaveMega}
-      className="sticky top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4"
+      className={cn(
+        "sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
+        // Opaque whenever the sheet is open: its scrim sits behind the bar and
+        // would otherwise dim it along with the page.
+        sheetOpen
+          ? "bg-surface border-line card-elev"
+          : settled
+            ? "glass-panel border-line card-elev"
+            : "border-transparent bg-transparent",
+      )}
     >
-      {/* The positioning context for the island and everything hanging off it. */}
-      <div
-        className={cn(
-          // Full width on mobile, where the bar holds only the brand and two
-          // buttons; from `lg` it shrinks to its contents so the nav sits
-          // tight inside the pill instead of floating between dead gaps.
-          "relative mx-auto w-full max-w-7xl lg:w-fit",
-        )}
-      >
+      <Container className="relative">
         <div
           className={cn(
-            "flex items-center justify-between rounded-full border pr-2 pl-3 sm:pl-4 lg:justify-start",
-            "transition-[height,gap,background-color,border-color,box-shadow] duration-400 ease-[cubic-bezier(0.22,0.75,0.2,1)]",
-            settled ? "h-14 gap-3 lg:gap-6" : "h-16 gap-3 lg:gap-8",
-            // The island carries its own surface and shadow at rest too —
-            // without them it is a hairline outline on an identical ground.
-            // Opaque whenever the sheet is open: its scrim sits behind the
-            // island and would otherwise dim the bar along with the page.
-            sheetOpen
-              ? "bg-surface border-line shadow-[var(--shadow-elev)]"
-              : settled
-                ? "glass-panel border-line shadow-[var(--shadow-elev)]"
-                : "glass-panel border-line card-elev",
+            "flex items-center gap-4 transition-[height] duration-300 ease-[cubic-bezier(0.22,0.75,0.2,1)] lg:gap-8",
+            settled ? "h-14" : "h-15",
           )}
         >
           <Logo className="shrink-0" />
 
-          <nav aria-label="Main" className="hidden lg:block">
-            <ul className="flex items-center gap-0.5">
-              {primaryNav.map((item) => {
-                const panel = megaPanelFor[item.href];
+          <nav aria-label="Main" className="mr-auto hidden lg:block">
+            <ul
+              ref={navListRef}
+              {...navListProps}
+              className="relative flex items-center"
+            >
+              {/* One indicator for the whole nav, not one fill per item. */}
+              <span {...indicatorProps} />
 
-                if (panel) {
-                  return (
-                    <li key={item.href}>
+              {primaryNav.map((item, index) => {
+                const panel = megaPanelFor[item.href];
+                const lit = litIndex === index;
+
+                return (
+                  <li
+                    key={item.href}
+                    {...navItemProps(index)}
+                    // React dispatches enter events from the root down, so an
+                    // ancestor calling stopPropagation here would swallow the
+                    // trigger's own hover handler underneath it.
+                    onMouseEnter={() => {
+                      navItemProps(index).onMouseEnter();
+                      if (!panel) leaveMega();
+                    }}
+                  >
+                    {panel ? (
                       <MegaTrigger
                         label={item.label}
                         href={item.href}
@@ -181,27 +203,24 @@ export function Header() {
                         panelId={`${megaId}-${panel}`}
                         isActive={isActive(item.href)}
                         isOpen={mega === panel}
+                        lit={lit}
                         onOpen={openMega}
                         onToggle={toggleMega}
                         onNavigate={closeMega}
                       />
-                    </li>
-                  );
-                }
-
-                return (
-                  <li key={item.href} onMouseEnter={leaveMega}>
-                    <Link
-                      href={item.href}
-                      onFocus={closeMega}
-                      aria-current={isActive(item.href) ? "page" : undefined}
-                      className={cn(
-                        navPillClasses(isActive(item.href)),
-                        "px-3.5 py-2",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        onFocus={closeMega}
+                        aria-current={isActive(item.href) ? "page" : undefined}
+                        className={cn(
+                          "relative z-10 block rounded-full px-3.5 py-1.5 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
+                          lit ? "text-bg" : "text-muted",
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -216,12 +235,12 @@ export function Header() {
               className="bg-line mr-1.5 h-6 w-px shrink-0"
             />
             <ThemeToggle />
-            <Button href="/contact" size="sm" variant="primary" withArrow>
+            <Button href="/contact" size="sm" variant="brand" withArrow>
               {cta.primary.label}
             </Button>
           </div>
 
-          <div className="flex items-center gap-1 lg:hidden">
+          <div className="ml-auto flex items-center gap-1 lg:hidden">
             <ThemeToggle />
             <button
               type="button"
@@ -250,13 +269,23 @@ export function Header() {
           </div>
         </div>
 
+        {/* The bar's bottom edge is also the reading progress: one line
+            doing both jobs rather than two competing hairlines. */}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "bg-gradient-brand scroll-progress absolute inset-x-0 -bottom-px h-0.5 origin-left transition-opacity duration-300",
+            settled ? "opacity-100" : "opacity-0",
+          )}
+        />
+
         <MobileSheet
           id={sheetId}
           open={sheetOpen}
           isActive={isActive}
           onNavigate={() => setOpenedOn(null)}
         />
-      </div>
+      </Container>
 
       {/* The sheet covers the page, so it gets a scrim; the desktop dropdown
           is a small floating card and does not need one. */}
@@ -298,12 +327,12 @@ function MobileSheet({
       aria-hidden={!open}
       inert={!open}
       className={cn(
-        "collapsible absolute inset-x-0 top-full z-10 mt-2 lg:hidden",
+        "collapsible absolute inset-x-0 top-full z-10 lg:hidden",
         open ? "collapsible-open" : "pointer-events-none",
       )}
     >
       <div className="collapsible-inner">
-        <div className="border-line bg-surface max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain rounded-3xl border p-3 shadow-[var(--shadow-elev)]">
+        <div className="border-line bg-surface max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-b px-2 py-3 shadow-[var(--shadow-elev)]">
           <nav aria-label="Mobile">
             <ul className="space-y-0.5">
               {primaryNav.map((item, index) => {

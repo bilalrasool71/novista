@@ -9,9 +9,15 @@ import { TechSection } from "@/components/sections/TechSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { Spotlight } from "@/components/ui/Spotlight";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { services } from "@/content/services";
-import { breadcrumbSchema, buildMetadata, serviceSchema, webPageSchema } from "@/lib/seo";
+import {
+  breadcrumbSchema,
+  buildMetadata,
+  serviceSchema,
+  webPageSchema,
+} from "@/lib/seo";
 
 const TITLE = "Software Development Services";
 const DESCRIPTION =
@@ -59,58 +65,60 @@ export default function ServicesPage() {
 
             return (
               <Reveal key={service.slug} delay={index * 60}>
-                <article className="border-line hover:border-ink grid gap-8 rounded-3xl bg-surface p-6 border transition-[border-color] duration-300 sm:p-8 lg:grid-cols-12 lg:gap-10">
-                  <div className="lg:col-span-5">
-                    <span className="bg-surface-2 text-ink grid size-12 place-items-center rounded-xl">
-                      <Icon aria-hidden="true" className="size-6" />
-                    </span>
+                <article className="group border-line hover:border-accent/45 relative isolate overflow-hidden rounded-3xl border bg-surface p-6 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] sm:p-8">
+                  <Spotlight />
 
-                    <h3 className="text-ink mt-5 text-2xl font-semibold">
-                      <Link
-                        href={`/services/${service.slug}`}
-                        className="hover:text-accent-2 transition-colors duration-200"
-                      >
-                        {service.name}
-                      </Link>
-                    </h3>
+                  <div className="above-spotlight grid gap-8 lg:grid-cols-12 lg:gap-10">
+                    <div className="lg:col-span-5">
+                      <span className="border-line bg-surface-2 text-accent-2 group-hover:bg-gradient-brand grid size-12 place-items-center rounded-2xl border transition-colors duration-300 group-hover:border-transparent group-hover:text-white">
+                        <Icon aria-hidden="true" className="size-6" />
+                      </span>
 
-                    <p className="text-accent-2 mt-2 font-medium">
-                      {service.promise}
-                    </p>
-
-                    <p className="text-muted mt-4 leading-relaxed">
-                      {service.summary}
-                    </p>
-
-                    <Button
-                      href={`/services/${service.slug}`}
-                      variant="secondary"
-                      size="sm"
-                      className="mt-6"
-                    >
-                      Explore {service.name}
-                      <ArrowRight aria-hidden="true" className="size-4" />
-                    </Button>
-                  </div>
-
-                  <div className="lg:col-span-7">
-                    <p className="text-muted eyebrow">
-                      What we build
-                    </p>
-                    <ul className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
-                      {service.offerings.slice(0, 8).map((offering) => (
-                        <li
-                          key={offering.title}
-                          className="text-muted flex gap-2.5 text-[0.9375rem]"
+                      <h3 className="text-ink mt-5 text-2xl font-semibold">
+                        <Link
+                          href={`/services/${service.slug}`}
+                          className="hover:text-accent-2 transition-colors duration-200"
                         >
-                          <Check
-                            aria-hidden="true"
-                            className="text-ink mt-1 size-4 shrink-0"
-                          />
-                          {offering.title}
-                        </li>
-                      ))}
-                    </ul>
+                          {service.name}
+                        </Link>
+                      </h3>
+
+                      <p className="text-accent-2 mt-2 font-medium">
+                        {service.promise}
+                      </p>
+
+                      <p className="text-muted mt-4 leading-relaxed">
+                        {service.summary}
+                      </p>
+
+                      <Button
+                        href={`/services/${service.slug}`}
+                        variant="secondary"
+                        size="sm"
+                        className="mt-6"
+                      >
+                        Explore {service.name}
+                        <ArrowRight aria-hidden="true" className="size-4" />
+                      </Button>
+                    </div>
+
+                    <div className="lg:col-span-7">
+                      <p className="text-muted eyebrow">What we build</p>
+                      <ul className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
+                        {service.offerings.slice(0, 8).map((offering) => (
+                          <li
+                            key={offering.title}
+                            className="text-muted flex gap-2.5 text-[0.9375rem]"
+                          >
+                            <Check
+                              aria-hidden="true"
+                              className="text-accent-2 mt-1 size-4 shrink-0"
+                            />
+                            {offering.title}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </article>
               </Reveal>
@@ -139,7 +147,11 @@ export default function ServicesPage() {
 
       <JsonLd
         data={[
-          webPageSchema({ name: TITLE, description: DESCRIPTION, path: "/services" }),
+          webPageSchema({
+            name: TITLE,
+            description: DESCRIPTION,
+            path: "/services",
+          }),
           breadcrumbSchema(crumbs),
           ...services.map((service) =>
             serviceSchema({

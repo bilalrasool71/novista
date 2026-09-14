@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { Spotlight } from "@/components/ui/Spotlight";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,11 +13,12 @@ import { cn } from "@/lib/utils";
 export type CardTone = "surface" | "panel" | "feature";
 
 const BASE =
-  "group relative flex h-full flex-col rounded-3xl border border-line bg-surface " +
-  " transition-[border-color,box-shadow,transform] duration-300";
+  "group relative isolate flex h-full flex-col overflow-hidden rounded-3xl " +
+  "border border-line bg-surface " +
+  "transition-[border-color,box-shadow,transform] duration-300";
 
 const INTERACTIVE =
-  "hover:-translate-y-1 hover:border-accent-2/50 hover:shadow-[var(--shadow-lift)] " +
+  "hover:border-accent/45 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] " +
   // A press that actually lands: the card settles back before it navigates.
   "active:translate-y-0 active:duration-100";
 
@@ -37,15 +39,22 @@ export function Card({
 }) {
   const classes = cn(BASE, padded && "p-6", href && INTERACTIVE, className);
 
+  const body = (
+    <>
+      {href ? <Spotlight /> : null}
+      <div className="above-spotlight flex h-full flex-col">{children}</div>
+    </>
+  );
+
   if (href) {
     return (
       <Link href={href} className={classes}>
-        {children}
+        {body}
       </Link>
     );
   }
 
-  return <Tag className={classes}>{children}</Tag>;
+  return <Tag className={classes}>{body}</Tag>;
 }
 
 /** Icon tile. Fills with brand on hover when the card is a link. */
@@ -122,7 +131,11 @@ export function CardChips({
 }
 
 /** The affordance at the foot of a linked card. */
-export function CardAction({ children = "Learn more" }: { children?: React.ReactNode }) {
+export function CardAction({
+  children = "Learn more",
+}: {
+  children?: React.ReactNode;
+}) {
   return (
     <span className="text-accent-2 mt-auto inline-flex items-center gap-1.5 pt-6 text-[0.9375rem] font-semibold">
       {children}

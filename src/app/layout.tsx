@@ -1,4 +1,3 @@
-import { ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { Archivo, Bricolage_Grotesque, Geist } from "next/font/google";
 import Script from "next/script";
@@ -9,6 +8,7 @@ import { FloatingActions } from "@/components/layout/FloatingActions";
 import { Grain } from "@/components/visuals/Aurora";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { SmoothAnchors } from "@/components/layout/SmoothAnchors";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_URL, site } from "@/content/site";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -135,16 +135,10 @@ export default function RootLayout({
         </a>
 
         <Header />
+        <SmoothAnchors />
 
         <main id="main" tabIndex={-1}>
-          {/*
-            Route changes crossfade instead of hard-cutting. The header and
-            footer sit outside this, so only the page body transitions — the
-            chrome stays put, which is what makes it read as one site rather
-            than a slideshow. Durations and the reduced-motion opt-out live in
-            globals.css.
-          */}
-          <ViewTransition>{children}</ViewTransition>
+          {children}
         </main>
 
         <Footer />
