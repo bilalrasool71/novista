@@ -168,13 +168,17 @@
     scroll-behavior: smooth;
     scroll-padding-top: 6rem;
     -webkit-text-size-adjust: 100%;
+    /* `clip` rather than `hidden`. Both stop sideways overflow, but `hidden`
+       turns the element into a scroll container, and a scroll container is
+       exactly what stops `position: sticky` working for everything inside
+       it — which is what was letting the header come unstuck. */
+    overflow-x: clip;
   }
 
   body {
     background-color: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;

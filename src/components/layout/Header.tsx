@@ -7,7 +7,6 @@ import { ChevronDown, Menu, X } from "lucide-react";
 
 import { Logo } from "@/components/layout/Logo";
 import {
-  MegaPanelBody,
   MegaTrigger,
   megaPanelFor,
   type MegaPanel,
@@ -48,50 +47,48 @@ export function Header() {
   const sheetOpen = openedOn === pathname;
 
   const [mega, setMega] = useState<MegaPanel | null>(null);
-  /**
-   * Whether the open panel was pinned by a click. Hovering a trigger opens
-   * the panel, so a click that simply toggled would close a panel the user
-   * had only grazed with the pointer — the first click pins, the second
-   * closes, and moving the pointer off the header closes an unpinned one.
-   */
-  const [pinned, setPinned] = useState(false);
-  /**
-   * Lags `mega` by one close: the panel needs content to animate out with,
-   * and clearing it on close would empty the box mid-collapse.
-   */
-  const [shown, setShown] = useState<MegaPanel | null>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const scrolled = useHeaderScroll(headerRef);
 
-  const anyMenuOpen = sheetOpen || mega !== null;
-  const { scrolled, concealed } = useHeaderScroll(headerRef, anyMenuOpen);
+  /**
+   * Hover intent. Opening needs a beat so that sweeping the pointer across
+   * the nav on the way somewhere else does not flash panels open; closing
+   * needs a longer one so a diagonal move toward the panel, which briefly
+   * leaves the trigger, does not shut it.
+   */
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const schedule = useCallback((run: () => void, delay: number) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(run, delay);
+  }, []);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   const closeMega = useCallback(() => {
+    clearTimeout(timer.current);
     setMega(null);
-    setPinned(false);
   }, []);
 
-  const openMega = useCallback((panel: MegaPanel) => {
-    setMega(panel);
-    setShown(panel);
-    setPinned(false);
-  }, []);
-
-  const toggleMega = useCallback(
+  const openMega = useCallback(
     (panel: MegaPanel) => {
-      // Flat rather than nested in a setState updater: React runs updaters
-      // during render, and queueing other components' updates from in there
-      // is what "state update on a component that hasn't mounted" means.
-      if (mega === panel && pinned) {
-        setMega(null);
-        setPinned(false);
-        return;
-      }
-      setMega(panel);
-      setShown(panel);
-      setPinned(true);
+      setMega((current) => (current === null ? current : panel));
+      // An already-open menu swaps immediately; the first one waits.
+      schedule(() => setMega(panel), 90);
     },
-    [mega, pinned],
+    [schedule],
   );
+
+  const leaveMega = useCallback(
+    () => schedule(() => setMega(null), 220),
+    [schedule],
+  );
+
+  const toggleMega = useCallback((panel: MegaPanel) => {
+    clearTimeout(timer.current);
+    setMega((current) => (current === panel ? null : panel));
+  }, []);
+
+  const anyMenuOpen = sheetOpen || mega !== null;
 
   // Close the mega panel on Escape, and on a click that lands outside it.
   useEffect(() => {
@@ -143,22 +140,16 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      onMouseLeave={() => {
-        if (!pinned) closeMega();
-      }}
+      onMouseLeave={leaveMega}
       className={cn(
-        "sticky top-0 z-50 transition-[transform,background-color,box-shadow,border-color] duration-400 ease-[cubic-bezier(0.22,0.75,0.2,1)]",
-        // Scrolled: a blurred glass bar. Menu open: fully opaque, because the
-        // scrim behind it would otherwise show straight through the glass and
-        // dim the bar along with the page.
-        anyMenuOpen && "bg-surface border-line card-elev border-b",
-        !anyMenuOpen &&
-          scrolled &&
+        "sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300",
+        // The sheet covers the page, so the bar above it must be opaque or the
+        // scrim shows straight through the glass and dims the bar too.
+        sheetOpen && "bg-surface border-line card-elev border-b",
+        !sheetOpen &&
+          solid &&
           "glass border-line card-elev border-b backdrop-blur-xl",
         !solid && "border-b border-transparent bg-transparent",
-        // Slides out of the way while reading down, and returns on the first
-        // upward flick.
-        concealed && "-translate-y-full",
       )}
     >
       <Container className="relative z-20">
@@ -182,29 +173,25 @@ export function Header() {
                         label={item.label}
                         href={item.href}
                         panel={panel}
-                        panelId={megaId}
+                        panelId={`${megaId}-${panel}`}
                         isActive={isActive(item.href)}
                         isOpen={mega === panel}
                         onOpen={openMega}
                         onToggle={toggleMega}
+                        onNavigate={closeMega}
                       />
                     </li>
                   );
                 }
 
                 return (
-                  <li
-                    key={item.href}
-                    onMouseEnter={() => {
-                      if (!pinned) closeMega();
-                    }}
-                  >
+                  <li key={item.href} onMouseEnter={leaveMega}>
                     <Link
                       href={item.href}
                       onFocus={closeMega}
                       aria-current={isActive(item.href) ? "page" : undefined}
                       className={cn(
-                        "group/nav relative block rounded-lg px-3 py-2 text-[0.9375rem] font-medium transition-colors duration-200",
+                        "group/nav relative block rounded-lg px-3 py-2 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
                         isActive(item.href)
                           ? "text-ink"
                           : "text-muted hover:text-ink",
@@ -270,50 +257,18 @@ export function Header() {
         )}
       />
 
-      {/* The page recedes behind an open menu. */}
+      {/* The sheet covers the page below `lg`, so it gets a scrim; the desktop
+          dropdown is a small floating card and does not need one. */}
       <div
         aria-hidden="true"
-        onClick={() => {
-          closeMega();
-          setOpenedOn(null);
-        }}
+        onClick={() => setOpenedOn(null)}
         className={cn(
-          "menu-scrim z-0",
-          anyMenuOpen && "menu-scrim-on",
-          // Below `lg` the scrim must take the tap that closes the sheet.
-          sheetOpen ? "pointer-events-auto" : "pointer-events-none",
+          "menu-scrim z-0 lg:hidden",
+          sheetOpen
+            ? "menu-scrim-on pointer-events-auto"
+            : "pointer-events-none",
         )}
       />
-
-      {/*
-        Desktop mega panel — full bleed, anchored under the bar. Height is
-        animated by the grid row rather than toggled, and the panel keeps its
-        content until the collapse has finished.
-      */}
-      <div
-        id={megaId}
-        aria-hidden={mega === null}
-        inert={mega === null}
-        className={cn(
-          "collapsible absolute inset-x-0 top-full z-10 hidden lg:grid",
-          mega ? "collapsible-open" : "pointer-events-none",
-        )}
-      >
-        <div className="collapsible-inner">
-          <div className="border-line bg-surface border-t shadow-[var(--shadow-elev)]">
-            <Container className="py-8">
-              {shown ? (
-                // Re-keying on the panel replays the stagger when it swaps.
-                <MegaPanelBody
-                  key={shown}
-                  panel={shown}
-                  onNavigate={closeMega}
-                />
-              ) : null}
-            </Container>
-          </div>
-        </div>
-      </div>
 
       <MobileSheet
         id={sheetId}
