@@ -8,6 +8,7 @@ import { TechSection } from "@/components/sections/TechSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
+import { TeamCard } from "@/components/cards/TeamCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { products } from "@/content/products";
@@ -68,24 +69,26 @@ export default function AboutPage() {
             <Reveal>
               <div className="text-muted space-y-5 text-lg leading-relaxed">
                 <p>
-                  A lot of software fails for reasons that have nothing to do with
-                  engineering. It solves a problem nobody had, or it encodes a
-                  process before anyone questioned whether the process made sense,
-                  or it is built so elaborately that changing it later costs more
-                  than building it did.
+                  A lot of software fails for reasons that have nothing to do
+                  with engineering. It solves a problem nobody had, or it
+                  encodes a process before anyone questioned whether the process
+                  made sense, or it is built so elaborately that changing it
+                  later costs more than building it did.
                 </p>
                 <p>
                   We work the other way round. Before architecture and before
-                  technology choices, we want to know what a task costs you today —
-                  in hours, in errors, in growth you are turning away. That number
-                  decides whether a project is worth doing and how big it should be.
+                  technology choices, we want to know what a task costs you
+                  today — in hours, in errors, in growth you are turning away.
+                  That number decides whether a project is worth doing and how
+                  big it should be.
                 </p>
                 <p>
                   Sometimes it tells us to build something substantial. Often it
                   tells us to build something much smaller than expected, or to
-                  integrate two systems you already own, or that the honest answer
-                  is an off-the-shelf product and no project at all. We would rather
-                  say that early than take on work we cannot justify.
+                  integrate two systems you already own, or that the honest
+                  answer is an off-the-shelf product and no project at all. We
+                  would rather say that early than take on work we cannot
+                  justify.
                 </p>
               </div>
             </Reveal>
@@ -134,19 +137,10 @@ export default function AboutPage() {
           description="Small team, no handover to a different department after the sales conversation. Our CTO reviews the architecture on every engagement."
         />
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2">
+        <div className="mx-auto mt-12 grid max-w-4xl gap-5 sm:grid-cols-2">
           {team.map((member, index) => (
             <Reveal key={member.name} delay={index * 80} className="h-full">
-              <article className="border-line hover:border-ink h-full rounded-3xl bg-surface p-6 border transition-[border-color] duration-300 sm:p-7">
-                <span className="bg-gradient-brand font-display grid size-14 place-items-center rounded-2xl text-lg font-bold text-white">
-                  {member.initials}
-                </span>
-                <h3 className="text-ink mt-5 text-xl font-semibold">
-                  {member.name}
-                </h3>
-                <p className="text-accent-2 mt-1 font-medium">{member.role}</p>
-                <p className="text-muted mt-3 leading-relaxed">{member.bio}</p>
-              </article>
+              <TeamCard member={member} />
             </Reveal>
           ))}
         </div>
@@ -212,9 +206,7 @@ export default function AboutPage() {
           <Reveal>
             <dl className="space-y-6">
               <div>
-                <dt className="text-muted eyebrow">
-                  Services
-                </dt>
+                <dt className="text-muted eyebrow">Services</dt>
                 <dd className="mt-2.5 flex flex-wrap gap-1.5">
                   {services.map((service) => (
                     <span
@@ -228,9 +220,7 @@ export default function AboutPage() {
               </div>
 
               <div>
-                <dt className="text-muted eyebrow">
-                  Products
-                </dt>
+                <dt className="text-muted eyebrow">Products</dt>
                 <dd className="mt-2.5 flex flex-wrap gap-1.5">
                   {products.map((product) => (
                     <span
@@ -244,9 +234,7 @@ export default function AboutPage() {
               </div>
 
               <div>
-                <dt className="text-muted eyebrow">
-                  Industries
-                </dt>
+                <dt className="text-muted eyebrow">Industries</dt>
                 <dd className="mt-2.5 flex flex-wrap gap-1.5">
                   {industries.map((industry) => (
                     <span
@@ -275,7 +263,11 @@ export default function AboutPage() {
 
       <JsonLd
         data={[
-          webPageSchema({ name: TITLE, description: DESCRIPTION, path: "/about" }),
+          webPageSchema({
+            name: TITLE,
+            description: DESCRIPTION,
+            path: "/about",
+          }),
           breadcrumbSchema(crumbs),
           {
             "@context": "https://schema.org",

@@ -1,11 +1,16 @@
 import { Button } from "@/components/ui/Button";
+import { TeamCard } from "@/components/cards/TeamCard";
 import { Card, CardBody, CardIcon, CardTitle } from "@/components/ui/Card";
 import { Reveal } from "@/components/ui/Reveal";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { team } from "@/content/site";
 import { differentiators } from "@/content/solutions";
 
-export function AboutSection({ tone = "surface" }: { tone?: "surface" | "panel" }) {
+export function AboutSection({
+  tone = "surface",
+}: {
+  tone?: "surface" | "panel";
+}) {
   return (
     <Section tone={tone} labelledBy="about-heading">
       <SectionHeading
@@ -33,20 +38,7 @@ export function AboutSection({ tone = "surface" }: { tone?: "surface" | "panel" 
         <ul className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-2">
           {team.map((member) => (
             <li key={member.name} className="h-full">
-              <Card>
-                <div className="flex items-center gap-4">
-                  <span className="from-g1 to-g3 grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br font-bold text-white">
-                    {member.initials}
-                  </span>
-                  <div>
-                    <p className="text-ink font-bold">{member.name}</p>
-                    <p className="text-accent-2 text-sm font-medium">
-                      {member.role}
-                    </p>
-                  </div>
-                </div>
-                <CardBody className="mt-4">{member.bio}</CardBody>
-              </Card>
+              <TeamCard member={member} />
             </li>
           ))}
         </ul>

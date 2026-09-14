@@ -108,14 +108,17 @@ export const socialLinks: { label: string; href: string }[] = (
 export const team = [
   {
     name: "Muhammad Bilal Rasool",
-    role: "Founder",
-    bio: "Leads Novista's direction and client partnerships, working with businesses to turn operational problems into software that pays for itself.",
+    role: "CEO & Co-Founder",
+    /** 4:5 portrait in public/team. Both are shot on the same setup. */
+    photo: "/team/bilal.jpg",
+    bio: "Bilal founded Novista on a straightforward conviction: software should pay for itself, and the people building it should be able to show you the arithmetic. He leads the company's direction and stays in the room for the work itself, scoping every engagement around what the current way of working actually costs rather than around how large a project could be made. It is also why he will tell you when the honest answer is a smaller build, an integration, or no project at all — the conversation clients remember, and the reason most of them are still here several releases later.",
     initials: "MB",
   },
   {
     name: "Moin Akmal Khan",
-    role: "Chief Technology Officer",
-    bio: "Owns architecture and engineering standards across every Novista platform, from data modelling and integrations through to AI systems in production.",
+    role: "CTO & Co-Founder",
+    photo: "/team/moin.jpg",
+    bio: "Moin owns the architecture and the engineering standards behind everything Novista ships — data models, integration layers, deployment pipelines and the AI systems now running in production across twelve platforms. He reviews the architecture on every engagement personally, which is how a deliberately small team keeps that many live systems dependable. His standing rule is that clients should be able to hand the codebase to another team tomorrow and have them thank you for it.",
     initials: "MK",
   },
 ] as const;

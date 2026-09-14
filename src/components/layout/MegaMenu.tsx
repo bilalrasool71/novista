@@ -43,6 +43,18 @@ const PANEL_WIDTH: Record<MegaPanel, string> = {
 const GUTTER = 16;
 
 /**
+ * Nav item geometry, shared with the inverted overlay the header renders on
+ * top of the sliding indicator. The two layers must measure identically or
+ * the inverted labels sit a pixel off their originals, so the padding and the
+ * type scale live here rather than being written out twice.
+ */
+export const NAV_TEXT = "text-[0.9375rem] font-medium whitespace-nowrap";
+export const NAV_LINK = "block rounded-full px-3.5 py-1.5";
+export const NAV_TRIGGER_LABEL = "block rounded-full py-1.5 pr-0.5 pl-3.5";
+export const NAV_CHEVRON =
+  "grid size-6 shrink-0 place-items-center rounded-full pr-1";
+
+/**
  * Keeps a trigger-centred panel inside the window.
  *
  * Centring alone breaks down for the triggers near either end of the nav —
@@ -87,7 +99,6 @@ export function MegaTrigger({
   panel,
   isActive,
   isOpen,
-  lit,
   panelId,
   onOpen,
   onToggle,
@@ -98,8 +109,6 @@ export function MegaTrigger({
   panel: MegaPanel;
   isActive: boolean;
   isOpen: boolean;
-  /** The sliding indicator is currently under this trigger. */
-  lit: boolean;
   panelId: string;
   onOpen: (panel: MegaPanel) => void;
   onToggle: (panel: MegaPanel) => void;
@@ -111,17 +120,12 @@ export function MegaTrigger({
     <div className="relative" onMouseEnter={() => onOpen(panel)}>
       {/* The pill wraps the label and its chevron so the two read as one
           target, matching the plain links either side of them. */}
-      <span
-        className={cn(
-          "relative z-10 flex items-center rounded-full text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
-          lit ? "text-bg" : "text-muted",
-        )}
-      >
+      <span className={cn("relative z-10 flex items-center", NAV_TEXT)}>
         <Link
           href={href}
           onFocus={() => onOpen(panel)}
           aria-current={isActive ? "page" : undefined}
-          className="block rounded-full py-1.5 pr-0.5 pl-3.5"
+          className={NAV_TRIGGER_LABEL}
         >
           {label}
         </Link>
@@ -132,7 +136,7 @@ export function MegaTrigger({
           aria-controls={panelId}
           aria-label={`${label} menu`}
           onClick={() => onToggle(panel)}
-          className="grid size-6 shrink-0 place-items-center rounded-full pr-1"
+          className={NAV_CHEVRON}
         >
           <ChevronDown
             aria-hidden="true"

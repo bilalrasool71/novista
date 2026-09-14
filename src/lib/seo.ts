@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SITE_URL, contact, site, socialLinks } from "@/content/site";
+import { SITE_URL, contact, site, socialLinks, team } from "@/content/site";
 import type { Faq } from "@/content/services";
 
 /** Absolute URL for a site-relative path. */
@@ -120,11 +120,19 @@ export function organizationSchema() {
     url: SITE_URL,
     description: site.description,
     foundingDate: String(site.foundingYear),
-    founder: {
-      "@type": "Person",
-      name: "Muhammad Bilal Rasool",
-      jobTitle: "Founder",
-    },
+    // Both are co-founders, and both are on /about with a photograph — so the
+    // markup says so rather than naming one of them and stopping there.
+    founder: team.map((member) => ({
+      "@type": "Person" as const,
+      name: member.name,
+      jobTitle: member.role,
+      image: absoluteUrl(member.photo),
+    })),
+    employee: team.map((member) => ({
+      "@type": "Person" as const,
+      name: member.name,
+      jobTitle: member.role,
+    })),
     ...(sameAs.length > 0 ? { sameAs } : {}),
     ...(contact.address
       ? {

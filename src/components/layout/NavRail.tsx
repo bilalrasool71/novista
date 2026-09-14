@@ -10,18 +10,26 @@ import { cn } from "@/lib/utils";
  * One pill exists, not one per item. It sits under the current section, moves
  * to whatever the pointer is over, and settles back when the pointer leaves —
  * so the nav reads as one object responding to you rather than six
- * independent things lighting up. The item the pill is under inverts its text,
- * which is why `target` is returned rather than kept private.
+ * independent things lighting up.
+ *
+ * The labels inside the pill are inverted by a *clipped duplicate* of the nav
+ * rather than by switching each item's own colour. Switching colours falls
+ * apart the moment the pill starts moving: the item being left turns dark
+ * while the pill is still over it, and the item being approached turns light
+ * before the pill arrives, so for most of the slide some label is sitting on
+ * the wrong background. The duplicate is clipped to exactly the pill's
+ * rectangle and animates on the same curve, so the inversion is always
+ * precisely where the pill is — frame for frame, including mid-flight.
  *
  * Positions are measured from the DOM instead of computed, so the indicator
  * stays correct through font swaps, resizes and label changes without anyone
- * having to keep a table of widths in sync.
+ * keeping a table of widths in sync.
  */
 export function useNavRail(activeIndex: number) {
   const listRef = useRef<HTMLUListElement>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   /** Kept through the empty state so the pill fades out in place. */
-  const [box, setBox] = useState({ x: 0, w: 0 });
+  const [box, setBox] = useState({ x: 0, w: 0, list: 0 });
   /**
    * Transitions stay off until the first measurement has painted. Otherwise
    * the indicator grows out of the left edge on every page load, animating
@@ -36,14 +44,18 @@ export function useNavRail(activeIndex: number) {
     const list = listRef.current;
     if (!list || target < 0) return;
 
-    // Addressed by element rather than by child index: the indicator is
-    // itself a child of the list, so indices would be off by one.
+    // Addressed by element rather than by child index: the indicator and the
+    // inverted overlay are themselves children of the list.
     const items = list.querySelectorAll<HTMLElement>(":scope > li");
 
     const measure = () => {
       const item = items[target];
       if (!item) return;
-      setBox({ x: item.offsetLeft, w: item.offsetWidth });
+      setBox({
+        x: item.offsetLeft,
+        w: item.offsetWidth,
+        list: list.offsetWidth,
+      });
     };
 
     measure();
@@ -59,9 +71,10 @@ export function useNavRail(activeIndex: number) {
     };
   }, [target]);
 
+  const right = Math.max(0, box.list - (box.x + box.w));
+
   return {
     listRef,
-    target,
     /** Spread onto each item's wrapper. */
     itemProps: (index: number) => ({
       onMouseEnter: () => setHovered(index),
@@ -89,6 +102,22 @@ export function useNavRail(activeIndex: number) {
         // background may not get a frame for a while, and the current
         // section should never be unmarked in the meantime. Before the
         // first measurement the indicator is zero-width anyway.
+        opacity: visible ? 1 : 0,
+      } satisfies React.CSSProperties,
+    },
+    /**
+     * Spread onto a copy of the nav rendered in the inverted colour. It is
+     * decorative and must never be reachable — the real nav sits beneath it.
+     */
+    overlayProps: {
+      "aria-hidden": true as const,
+      inert: true,
+      className: cn(
+        "text-bg pointer-events-none absolute inset-0 z-20 flex items-center",
+        ready && "slide-spring",
+      ),
+      style: {
+        clipPath: `inset(0 ${right}px 0 ${box.x}px round 9999px)`,
         opacity: visible ? 1 : 0,
       } satisfies React.CSSProperties,
     },

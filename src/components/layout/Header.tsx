@@ -8,6 +8,10 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import {
   MegaTrigger,
+  NAV_CHEVRON,
+  NAV_LINK,
+  NAV_TEXT,
+  NAV_TRIGGER_LABEL,
   megaPanelFor,
   type MegaPanel,
 } from "@/components/layout/MegaMenu";
@@ -138,10 +142,10 @@ export function Header() {
   const activeIndex = primaryNav.findIndex((item) => isActive(item.href));
   const {
     listRef: navListRef,
-    target: litIndex,
     itemProps: navItemProps,
     listProps: navListProps,
     indicatorProps,
+    overlayProps,
   } = useNavRail(activeIndex);
 
   const settled = scrolled || sheetOpen || mega !== null;
@@ -174,14 +178,13 @@ export function Header() {
             <ul
               ref={navListRef}
               {...navListProps}
-              className="relative flex items-center"
+              className="text-muted relative flex items-center"
             >
               {/* One indicator for the whole nav, not one fill per item. */}
               <span {...indicatorProps} />
 
               {primaryNav.map((item, index) => {
                 const panel = megaPanelFor[item.href];
-                const lit = litIndex === index;
 
                 return (
                   <li
@@ -203,7 +206,6 @@ export function Header() {
                         panelId={`${megaId}-${panel}`}
                         isActive={isActive(item.href)}
                         isOpen={mega === panel}
-                        lit={lit}
                         onOpen={openMega}
                         onToggle={toggleMega}
                         onNavigate={closeMega}
@@ -213,10 +215,7 @@ export function Header() {
                         href={item.href}
                         onFocus={closeMega}
                         aria-current={isActive(item.href) ? "page" : undefined}
-                        className={cn(
-                          "relative z-10 block rounded-full px-3.5 py-1.5 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
-                          lit ? "text-bg" : "text-muted",
-                        )}
+                        className={cn("relative z-10", NAV_LINK, NAV_TEXT)}
                       >
                         {item.label}
                       </Link>
@@ -224,6 +223,31 @@ export function Header() {
                   </li>
                 );
               })}
+
+              {/*
+                An exact, inert copy of the labels in the inverted colour,
+                clipped to the indicator and animated on the same curve. This
+                is what keeps a label readable while the pill is travelling
+                over it — colour-switching each item instead leaves the one
+                being left dark on dark and the one being approached light on
+                light for the length of the slide.
+              */}
+              <span {...overlayProps}>
+                {primaryNav.map((item) => (
+                  <span key={item.href} className="flex items-center">
+                    <span className={cn(NAV_TRIGGER_LABEL, NAV_TEXT)}>
+                      {item.label}
+                    </span>
+                    {megaPanelFor[item.href] ? (
+                      <span className={NAV_CHEVRON}>
+                        <ChevronDown className="size-3.5" />
+                      </span>
+                    ) : (
+                      <span className="pr-3" />
+                    )}
+                  </span>
+                ))}
+              </span>
             </ul>
           </nav>
 
