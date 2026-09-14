@@ -1,0 +1,607 @@
+@import "tailwindcss";
+
+/* Theme is set on <html> by an inline script before first paint. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------
+   Novista design system
+
+   A cool off-white ground, a four-stop brand ramp taken from the mark
+   (deep navy through to its sky blue), pill geometry on controls and soft
+   aurora light in place of any grid. Depth comes from elevation and grain,
+   never from ruled lines.
+
+   Every colour is a token so the dark theme is a redefinition rather than a
+   second set of classes. The `night-*` and `aurora-*` families are the two
+   deliberate exceptions — see their notes below.
+------------------------------------------------------------------- */
+@theme {
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-face), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-label: var(--font-label-face), var(--font-sans-face), ui-sans-serif,
+    system-ui, sans-serif;
+  /* Only for genuine machine output — an error digest. Deliberately a system
+     stack, so it costs nothing to download. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Surfaces — cool off-white, tuned to sit under the navy mark. */
+  --color-bg: #f7f9fc;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef3f9;
+  --color-line: #dde5ef;
+  --color-line-strong: #0b1628;
+
+  /* Text — the ink is the navy from the logo, not a neutral black. */
+  --color-ink: #0b1628;
+  --color-ink-soft: #16294b;
+  --color-muted: #5b6a80;
+
+  /* Brand ramp, taken from the mark: deep navy through to its sky blue. */
+  --color-g1: #16294b;
+  --color-g2: #1e5fa8;
+  --color-g3: #2e9be0;
+  --color-g4: #6fd3f5;
+
+  /* `accent` fills and marks; `accent-2` is the text-safe darker blue. */
+  --color-accent: #2e9be0;
+  --color-accent-2: #1e5fa8;
+
+  /* The night ground stays dark in BOTH themes — the closing band, the
+     footer, and any inverted card. Its own ink/muted/line tones are fixed
+     for the same reason: they must not flip when the theme does. */
+  --color-night: #0b1628;
+  --color-night-ink: #f4f8fd;
+  --color-night-muted: #96a9c2;
+  --color-night-line: #26344d;
+
+  /* Aurora light. Always lighter than the ground it sits on, so it reads
+     as light rather than as a smudge. */
+  --color-aurora-1: #6fd3f5;
+  --color-aurora-2: #2e9be0;
+
+  /* Gradient TEXT runs on its own stops. The full g1..g4 ramp is built for a
+     fill: one end of it always falls below 3:1 on the ground behind it, which
+     is fine under white text but not when the ramp IS the text. These stay
+     between 4.6:1 and 13.7:1 across the sweep. */
+  --text-grad-1: #16294b;
+  --text-grad-2: #1e5fa8;
+  --text-grad-3: #2472c4;
+
+  /* Status tones. Tokens rather than Tailwind's amber/red ramps, so a notice
+     is not a bright cream slab in the dark theme. */
+  --color-notice: #fdf1d9;
+  --color-notice-line: #ecd29a;
+  --color-notice-ink: #7a4e07;
+  --color-notice-icon: #96600a;
+
+  --color-danger: #fdeeee;
+  --color-danger-line: #f0bdbd;
+  --color-danger-ink: #8a1c1c;
+  --color-danger-icon: #c02626;
+
+  --color-positive: #e6f6ec;
+  --color-positive-line: #aadcbc;
+  --color-positive-ink: #14633a;
+
+  /* Radius scale. `rounded-xl` is the workhorse — icon tiles, inputs, small
+     panels — so it is set generously; `3xl` is the card. Redefining the scale
+     here keeps one geometry across the site without renaming utilities. */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+
+  --shadow-card: 0 1px 2px rgb(11 22 40 / 0.05), 0 8px 24px rgb(11 22 40 / 0.07);
+  --shadow-glow: 0 20px 60px -20px rgb(46 155 224 / 0.38);
+  --shadow-elev: 0 30px 80px -30px rgb(11 22 40 / 0.28);
+  /* Card hover: brand light from below, not a heavier grey. */
+  --shadow-lift: 0 1px 2px rgb(11 22 40 / 0.04), 0 24px 50px -26px rgb(30 95 168 / 0.45);
+}
+
+/* ------------------------------------------------------------------
+   Dark theme
+------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --aurora-opacity: 0.34;
+  --color-bg: #070c16;
+  --color-surface: #0e1524;
+  --color-surface-2: #151e30;
+  --color-line: #1e2940;
+  --color-line-strong: #f4f8fd;
+
+  --color-ink: #f4f8fd;
+  --color-ink-soft: #dbe5f2;
+  --color-muted: #93a3ba;
+
+  --color-g1: #24427a;
+  --color-g2: #2e77c9;
+  --color-g3: #4fb2ee;
+  --color-g4: #8bdefb;
+
+  --color-accent: #4fb2ee;
+  --color-accent-2: #6cc4f2;
+
+  --color-night: #0b1120;
+  --color-aurora-1: #2e77c9;
+  --color-aurora-2: #1e5fa8;
+
+  --text-grad-1: #8bdefb;
+  --text-grad-2: #4fb2ee;
+  --text-grad-3: #6cc4f2;
+
+  --color-notice: #241a06;
+  --color-notice-line: #4a3a12;
+  --color-notice-ink: #f4d9a0;
+  --color-notice-icon: #e8b95f;
+
+  --color-danger: #2a1212;
+  --color-danger-line: #4e2020;
+  --color-danger-ink: #f8c9c9;
+  --color-danger-icon: #f08585;
+
+  --color-positive: #0d2318;
+  --color-positive-line: #1d4530;
+  --color-positive-ink: #86dfad;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-glow: 0 20px 60px -20px rgb(79 178 238 / 0.45);
+  --shadow-elev: 0 30px 80px -30px rgb(0 0 0 / 0.7);
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 24px 50px -26px rgb(79 178 238 / 0.35);
+
+  --grain-opacity: 0.025;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --grain-opacity: 0.035;
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-g2);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--color-g2);
+    color: #fff;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-muted);
+  }
+
+  /* Long unbroken strings — a URL, an address — may break mid-word rather
+     than push the page sideways. */
+  p,
+  li,
+  a,
+  dd,
+  td {
+    overflow-wrap: break-word;
+  }
+
+  /* Headings never may. A display face chopped mid-word ("Technolog / y")
+     looks like a rendering fault; a heading that needs breaking is a heading
+     in a column too narrow for it, and that is a layout fix. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: normal;
+    hyphens: manual;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+------------------------------------------------------------------- */
+
+@utility reveal-init {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 850ms cubic-bezier(0.2, 0.6, 0.2, 1),
+    transform 850ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@utility reveal-shown {
+  opacity: 1;
+  transform: none;
+}
+
+/* The signature: a slowly drifting four-stop gradient in text. */
+@keyframes novista-gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@utility text-gradient {
+  background: linear-gradient(
+    120deg,
+    var(--text-grad-1),
+    var(--text-grad-2) 45%,
+    var(--text-grad-3) 75%,
+    var(--text-grad-1)
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: novista-gradient-shift 12s ease-in-out infinite;
+}
+
+@utility bg-gradient-brand {
+  background-image: linear-gradient(
+    120deg,
+    var(--color-g1),
+    var(--color-g2) 35%,
+    var(--color-g3) 70%,
+    var(--color-g4)
+  );
+}
+
+/* The small uppercase label above a heading, and on chips and statuses. */
+@utility eyebrow {
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  /* Wide enough to read as a label, not so wide the words come apart. */
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  /* Uppercase never needs the lowercase-height tabular figures. */
+  font-variant-numeric: lining-nums;
+}
+
+@utility card-elev {
+  box-shadow: var(--shadow-card);
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-bg) 78%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+@utility glow-soft {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Lets the browser skip offscreen sections — a real scroll win on a long page. */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 800px;
+}
+
+/* ------------------------------------------------------------------
+   Route transitions
+
+   A short crossfade on the page body. Long enough to register as a change of
+   content, short enough that it never delays a click.
+------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0.28, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Menu motion
+
+   Open/close height is animated with a 0fr -> 1fr grid row rather than
+   max-height: it lands on the content's real height, so the panel never
+   snaps at the end or eases against a guessed ceiling.
+------------------------------------------------------------------- */
+@utility collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  /* Both properties live here rather than in a `transition-*` utility, which
+     would replace this shorthand and leave the height snapping. */
+  transition:
+    grid-template-rows 380ms cubic-bezier(0.22, 0.75, 0.2, 1),
+    opacity 240ms ease-out;
+}
+
+@utility collapsible-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* The row's child must clip, or the content shows through at 0fr. */
+@utility collapsible-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* The dim behind an open menu. Fixed, so it covers the viewport rather than
+   the header's own box, and it never sits over the header itself. */
+@utility menu-scrim {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklab, var(--color-night) 42%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 300ms ease,
+    visibility 300ms;
+  backdrop-filter: blur(2px);
+}
+
+@utility menu-scrim-on {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Reading progress, drawn along the header's bottom edge. The value is
+   written to the element by the scroll handler, so the bar updates without a
+   React render on every frame. */
+@utility scroll-progress {
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+}
+
+@keyframes novista-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Items rise in sequence behind the panel. `--i` is the item's position. */
+@utility menu-item-in {
+  animation: novista-menu-item-in 420ms cubic-bezier(0.22, 0.75, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 35ms + 60ms);
+}
+
+/* A live indicator: the dot holds, a ring breathes out from under it. The
+   global reduced-motion rule stops the ring without hiding the dot. */
+@keyframes novista-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@utility pulse-dot {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+@utility pulse-dot-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: novista-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Hairline above a block sitting on the night ground. */
+@utility rule-dark {
+  border-top: 1px solid var(--color-night-line);
+}
+
+/* The soft brand wash that lifts the night ground off flat black. */
+@utility night-wash {
+  background-image:
+    radial-gradient(
+      60% 80% at 8% 0%,
+      color-mix(in oklab, var(--color-g2) 40%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 70% at 92% 100%,
+      color-mix(in oklab, var(--color-g3) 26%, transparent),
+      transparent 70%
+    );
+}
+
+/* Link underline that grows from the left on hover. */
+@utility underline-grow {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  transition: background-size 0.35s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* ------------------------------------------------------------------
+   Aurora — soft colour light, in place of any grid
+------------------------------------------------------------------- */
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: var(--aurora-opacity, 0.3);
+  pointer-events: none;
+  /* Promoted to its own layer so the blur is not recomposited on scroll. */
+  transform: translateZ(0);
+}
+
+@keyframes novista-aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(20px, -20px, 0) scale(1.05);
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .aurora-animate-1 {
+    animation: novista-aurora-drift 28s ease-in-out infinite;
+  }
+  .aurora-animate-2 {
+    animation: novista-aurora-drift 36s ease-in-out infinite reverse;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Grain — fixed film overlay, deliberately not mix-blend-mode
+------------------------------------------------------------------- */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: var(--grain-opacity, 0.035);
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  transform: translateZ(0);
+}
+
+/* ------------------------------------------------------------------
+   Vertical marquee for the platform wall
+------------------------------------------------------------------- */
+@keyframes novista-scroll-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+@keyframes novista-scroll-down {
+  from {
+    transform: translate3d(0, -50%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@utility marquee-up {
+  animation: novista-scroll-up var(--marquee-duration, 52s) linear infinite;
+}
+
+@utility marquee-down {
+  animation: novista-scroll-down var(--marquee-duration, 64s) linear infinite;
+}
+
+@utility mask-fade-y {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion
+------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal-init {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .marquee-up,
+  .marquee-down {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Without this the ring would freeze at its final frame — fully scaled and
+     invisible is fine, but a stalled half-scaled ring is not. */
+  .pulse-dot-ring {
+    display: none !important;
+  }
+
+  /* The menu still opens and closes, it just arrives at once. */
+  .collapsible {
+    transition-duration: 0.001ms !important;
+  }
+
+  .menu-item-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .menu-scrim {
+    transition-duration: 0.001ms !important;
+  }
+}
