@@ -14,19 +14,29 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Three-state theme control: light, dark, or follow the system.
+ * Theme control: one button that cycles light → dark → follow the system.
+ *
+ * A three-segment switch was the widest thing on the bar, which is too much
+ * weight for a preference most people set once. The cycle keeps all three
+ * states reachable in a single target; the label and title always name the
+ * state it will move to, so nobody has to guess what the icon means.
  *
  * The initial theme is applied by an inline script in the root layout before
  * first paint, so there is never a flash of the wrong one. This component
  * only reflects and changes the stored preference.
  */
-const OPTIONS: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "system", label: "System", icon: Monitor },
-  { value: "dark", label: "Dark", icon: Moon },
-];
+const ORDER: ThemePreference[] = ["light", "dark", "system"];
 
-export function ThemeToggle() {
+const META: Record<
+  ThemePreference,
+  { icon: typeof Sun; now: string; next: string }
+> = {
+  light: { icon: Sun, now: "Light", next: "dark" },
+  dark: { icon: Moon, now: "Dark", next: "system" },
+  system: { icon: Monitor, now: "System", next: "light" },
+};
+
+export function ThemeToggle({ className }: { className?: string }) {
   const preference = useSyncExternalStore(
     subscribeToTheme,
     getThemePreference,
@@ -43,39 +53,43 @@ export function ThemeToggle() {
     return () => media.removeEventListener("change", onChange);
   }, [preference]);
 
+  const meta = META[preference];
+  const label = `Theme: ${meta.now}. Switch to ${meta.next}.`;
+
   return (
-    <div
-      role="radiogroup"
-      aria-label="Colour theme"
+    <button
+      type="button"
+      onClick={() =>
+        setThemePreference(
+          ORDER[(ORDER.indexOf(preference) + 1) % ORDER.length],
+        )
+      }
+      aria-label={label}
+      title={label}
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-xl p-0.5 transition-colors duration-300",
-        "bg-surface-2 border border-line",
+        "text-muted hover:text-ink hover:bg-surface-2 relative grid size-9 shrink-0 place-items-center rounded-full transition-colors duration-200",
+        className,
       )}
     >
-      {OPTIONS.map((option) => {
-        const Icon = option.icon;
-        const selected = preference === option.value;
+      {/* All three are mounted and cross-faded, so the swap has somewhere to
+          animate from and the button never reflows. */}
+      {ORDER.map((value) => {
+        const Icon = META[value].icon;
+        const active = value === preference;
 
         return (
-          <button
-            key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={selected}
-            aria-label={`${option.label} theme`}
-            title={`${option.label} theme`}
-            onClick={() => setThemePreference(option.value)}
+          <Icon
+            key={value}
+            aria-hidden="true"
             className={cn(
-              "grid size-8 place-items-center rounded-lg transition-colors duration-200",
-              selected
-                ? "bg-surface text-accent-2 card-elev"
-                : "text-muted hover:text-ink",
+              "absolute size-[1.05rem] transition-[opacity,transform] duration-300 ease-out",
+              active
+                ? "scale-100 rotate-0 opacity-100"
+                : "scale-50 -rotate-90 opacity-0",
             )}
-          >
-            <Icon aria-hidden="true" className="size-4" />
-          </button>
+          />
         );
       })}
-    </div>
+    </button>
   );
 }

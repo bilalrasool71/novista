@@ -43,6 +43,24 @@ const PANEL_WIDTH: Record<MegaPanel, string> = {
 const GUTTER = 16;
 
 /**
+ * The shared nav-item treatment: a soft pill fills in behind the label on
+ * hover and stays filled for the current section. Exported so the plain links
+ * in the header and the dropdown triggers cannot drift apart.
+ */
+export function navPillClasses(active: boolean) {
+  return cn(
+    "relative block rounded-full text-[0.9375rem] font-medium whitespace-nowrap",
+    "transition-colors duration-200",
+    "before:absolute before:inset-0 before:-z-10 before:rounded-full",
+    "before:transition-[opacity,transform] before:duration-200 before:ease-out",
+    "before:bg-surface-2 before:content-['']",
+    active
+      ? "text-ink before:scale-100 before:opacity-100"
+      : "text-muted hover:text-ink before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
+  );
+}
+
+/**
  * Keeps a trigger-centred panel inside the window.
  *
  * Centring alone breaks down for the triggers near either end of the nav —
@@ -106,26 +124,30 @@ export function MegaTrigger({
 
   return (
     <div className="relative" onMouseEnter={() => onOpen(panel)}>
-      <span className="flex items-center">
+      {/* The pill wraps the label and its chevron so the two read as one
+          target, matching the plain links either side of them. */}
+      <span
+        className={cn(
+          "group/pill relative flex items-center rounded-full",
+          "before:absolute before:inset-0 before:-z-10 before:rounded-full before:content-['']",
+          "before:bg-surface-2 before:transition-[opacity,transform] before:duration-200 before:ease-out",
+          isActive || isOpen
+            ? "before:scale-100 before:opacity-100"
+            : "before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
+        )}
+      >
         <Link
           href={href}
           onFocus={() => onOpen(panel)}
           aria-current={isActive ? "page" : undefined}
           className={cn(
-            "group/nav relative block rounded-lg py-2 pr-0.5 pl-3 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
-            isActive || isOpen ? "text-ink" : "text-muted hover:text-ink",
+            "block rounded-full py-2 pr-1 pl-3.5 text-[0.9375rem] font-medium whitespace-nowrap transition-colors duration-200",
+            isActive || isOpen
+              ? "text-ink"
+              : "text-muted group-hover/pill:text-ink",
           )}
         >
           {label}
-          <span
-            aria-hidden="true"
-            className={cn(
-              "bg-gradient-brand absolute inset-x-3 bottom-0 h-0.5 origin-left rounded-full transition-transform duration-300 ease-out",
-              isActive || isOpen
-                ? "scale-x-100"
-                : "scale-x-0 group-hover/nav:scale-x-100",
-            )}
-          />
         </Link>
 
         <button
@@ -135,8 +157,10 @@ export function MegaTrigger({
           aria-label={`${label} menu`}
           onClick={() => onToggle(panel)}
           className={cn(
-            "mr-1 grid size-6 place-items-center rounded-full transition-colors duration-200",
-            isOpen ? "text-ink" : "text-muted hover:text-ink",
+            "grid size-7 place-items-center rounded-full pr-1 transition-colors duration-200",
+            isActive || isOpen
+              ? "text-ink"
+              : "text-muted group-hover/pill:text-ink",
           )}
         >
           <ChevronDown
