@@ -35,7 +35,7 @@ export function AboutSection({
       </ul>
 
       <Reveal className="mt-12">
-        <ul className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-2">
+        <ul className="mx-auto max-w-4xl space-y-5">
           {team.map((member) => (
             <li key={member.name} className="h-full">
               <TeamCard member={member} />

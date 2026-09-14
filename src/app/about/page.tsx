@@ -137,7 +137,7 @@ export default function AboutPage() {
           description="Small team, no handover to a different department after the sales conversation. Our CTO reviews the architecture on every engagement."
         />
 
-        <div className="mx-auto mt-12 grid max-w-4xl gap-5 sm:grid-cols-2">
+        <div className="mx-auto mt-12 max-w-4xl space-y-5">
           {team.map((member, index) => (
             <Reveal key={member.name} delay={index * 80} className="h-full">
               <TeamCard member={member} />

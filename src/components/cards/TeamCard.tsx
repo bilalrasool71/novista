@@ -7,16 +7,17 @@ import { cn } from "@/lib/utils";
 type Member = (typeof team)[number];
 
 /**
- * A leadership card built around the portrait rather than beside it.
+ * A leadership card: portrait beside the words, not above them.
  *
- * Both photographs come from the same studio setup — monochrome, same crop,
- * same light — so they are treated as one pair: the image holds a fixed 4:5
- * frame and the name sits over its foot on a gradient scrim, which keeps the
- * two cards aligned however long the names and titles run.
+ * Stacked, a 4:5 portrait across the full width of a card ran 546px tall and
+ * took 63% of an 867px card — two photographs that size stop being portraits
+ * and start being the page. Set alongside the text the same photograph holds
+ * its presence at a fifth of the height, and two people fit in one column
+ * that reads as a pair rather than as a gallery.
  *
- * The mark stays greyscale at rest and warms on hover, a small piece of
- * motion that earns its place by tying the photograph to the brand without
- * tinting it permanently.
+ * Both images come from the same studio setup, so they keep a shared 4:5
+ * frame and a fixed width: the two cards then line up exactly however long
+ * the names and titles run.
  */
 export function TeamCard({
   member,
@@ -28,46 +29,35 @@ export function TeamCard({
   return (
     <article
       className={cn(
-        "group border-line hover:border-accent/45 relative isolate flex h-full flex-col overflow-hidden rounded-3xl border bg-surface",
+        "group border-line hover:border-accent/45 relative isolate flex h-full flex-col overflow-hidden rounded-3xl border bg-surface p-5 sm:p-6",
         "transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
         className,
       )}
     >
       <Spotlight />
 
-      <div className="above-spotlight flex h-full flex-col">
-        <div className="bg-surface-2 relative aspect-4/5 overflow-hidden">
+      {/* `items-start`, or the row's default stretch overrides the portrait's
+          aspect ratio and each photograph ends up a different height. */}
+      <div className="above-spotlight flex flex-col items-start gap-5 sm:flex-row sm:gap-6">
+        <div className="border-line bg-surface-2 relative aspect-4/5 w-32 shrink-0 overflow-hidden rounded-2xl border sm:w-36 lg:w-40">
           <Image
             src={member.photo}
             alt={`${member.name}, ${member.role} at Novista Solutions`}
             fill
-            sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 100vw"
-            className={cn(
-              "object-cover object-top transition-[transform,filter] duration-700 ease-out",
-              // Greyscale at rest, full tone on hover — the portraits are
-              // monochrome already, so this reads as a lift rather than a
-              // filter switching on and off.
-              "scale-100 contrast-[1.02] group-hover:scale-[1.03]",
-            )}
+            sizes="(min-width: 1024px) 10rem, (min-width: 640px) 9rem, 8rem"
+            className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           />
-
-          {/* The scrim is what makes white type legible over any portrait. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#0b1628] via-[#0b1628]/70 to-transparent"
-          />
-
-          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-            <h3 className="font-display text-xl leading-tight font-semibold text-white">
-              {member.name}
-            </h3>
-            <p className="eyebrow mt-2 text-[#8bdefb]">{member.role}</p>
-          </div>
         </div>
 
-        <p className="text-muted flex-1 p-5 text-[0.9375rem] leading-[1.65] sm:p-6">
-          {member.bio}
-        </p>
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow text-accent-2">{member.role}</p>
+          <h3 className="font-display text-ink mt-2 text-xl leading-tight font-semibold sm:text-2xl">
+            {member.name}
+          </h3>
+          <p className="text-muted mt-3.5 text-[0.9375rem] leading-[1.65]">
+            {member.bio}
+          </p>
+        </div>
       </div>
     </article>
   );
