@@ -153,13 +153,15 @@ export function Header() {
             "flex items-center justify-between rounded-full border pr-2 pl-3 sm:pl-4 lg:justify-start",
             "transition-[height,gap,background-color,border-color,box-shadow] duration-400 ease-[cubic-bezier(0.22,0.75,0.2,1)]",
             settled ? "h-14 gap-3 lg:gap-6" : "h-16 gap-3 lg:gap-8",
+            // The island carries its own surface and shadow at rest too —
+            // without them it is a hairline outline on an identical ground.
             // Opaque whenever the sheet is open: its scrim sits behind the
             // island and would otherwise dim the bar along with the page.
             sheetOpen
-              ? "bg-surface border-line card-elev"
+              ? "bg-surface border-line shadow-[var(--shadow-elev)]"
               : settled
-                ? "glass border-line card-elev backdrop-blur-xl"
-                : "glass border-line/70 backdrop-blur-md",
+                ? "glass-panel border-line shadow-[var(--shadow-elev)]"
+                : "glass-panel border-line card-elev",
           )}
         >
           <Logo className="shrink-0" />

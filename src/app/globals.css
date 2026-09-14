@@ -318,6 +318,20 @@
   backdrop-filter: blur(10px);
 }
 
+/**
+ * The header island's surface.
+ *
+ * Built on `--color-surface`, not `--color-bg`: a panel tinted with the page's
+ * own background is the same colour as the thing behind it, which leaves it
+ * reading as a bare outline rather than something sitting above the page. The
+ * surface token is lighter than the ground in the light theme and lighter
+ * again in the dark one, so the island is elevated in both.
+ */
+@utility glass-panel {
+  background: color-mix(in oklab, var(--color-surface) 86%, transparent);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+
 @utility glow-soft {
   box-shadow: var(--shadow-glow);
 }
