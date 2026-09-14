@@ -77,27 +77,35 @@ export default async function ServicePage({ params }: Props) {
           </>
         }
         aside={
-          <div className="border-line rounded-3xl bg-surface p-6 border sm:p-7">
-            <span className="border-line bg-surface-2 text-accent-2 grid size-12 place-items-center rounded-2xl border">
-              <Icon aria-hidden="true" className="size-6" />
-            </span>
-            <p className="text-ink mt-5 text-lg leading-snug font-semibold">
-              {service.promise}
-            </p>
-            <p className="text-muted mt-6 eyebrow">
-              What you get
-            </p>
-            <ul className="mt-3 space-y-2">
-              {service.deliverables.map((item) => (
-                <li key={item} className="text-muted flex gap-2.5 text-[0.9375rem]">
-                  <Check
-                    aria-hidden="true"
-                    className="text-ink mt-1 size-4 shrink-0"
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
+          <div className="border-line card-elev overflow-hidden rounded-3xl border bg-surface">
+            <div className="flex items-start gap-4 p-6 sm:p-7">
+              <span className="border-line bg-surface-2 text-accent-2 grid size-11 shrink-0 place-items-center rounded-2xl border">
+                <Icon aria-hidden="true" className="size-5" />
+              </span>
+              <p className="text-ink text-[1.0625rem] leading-snug font-semibold">
+                {service.promise}
+              </p>
+            </div>
+
+            {/* The deliverables run two-up so the card stays close in height to
+                the title beside it rather than trailing far below it. */}
+            <div className="border-line bg-surface-2 border-t p-6 sm:p-7">
+              <p className="eyebrow text-muted">What you get</p>
+              <ul className="mt-3.5 grid gap-x-5 gap-y-2.5 sm:grid-cols-2">
+                {service.deliverables.map((item) => (
+                  <li
+                    key={item}
+                    className="text-muted flex gap-2 text-[0.9375rem] leading-snug"
+                  >
+                    <Check
+                      aria-hidden="true"
+                      className="text-accent-2 mt-0.5 size-4 shrink-0"
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         }
       />

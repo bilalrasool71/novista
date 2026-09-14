@@ -53,10 +53,10 @@ export function navPillClasses(active: boolean) {
     "transition-colors duration-200",
     "before:absolute before:inset-0 before:-z-10 before:rounded-full",
     "before:transition-[opacity,transform] before:duration-200 before:ease-out",
-    "before:bg-surface-2 before:content-['']",
+    "before:content-['']",
     active
-      ? "text-ink before:scale-100 before:opacity-100"
-      : "text-muted hover:text-ink before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
+      ? "text-ink before:bg-nav-pill-active before:scale-100 before:opacity-100"
+      : "text-muted hover:text-ink before:bg-nav-pill before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
   );
 }
 
@@ -130,10 +130,12 @@ export function MegaTrigger({
         className={cn(
           "group/pill relative flex items-center rounded-full",
           "before:absolute before:inset-0 before:-z-10 before:rounded-full before:content-['']",
-          "before:bg-surface-2 before:transition-[opacity,transform] before:duration-200 before:ease-out",
-          isActive || isOpen
-            ? "before:scale-100 before:opacity-100"
-            : "before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
+          "before:transition-[opacity,transform] before:duration-200 before:ease-out",
+          isActive
+            ? "before:bg-nav-pill-active before:scale-100 before:opacity-100"
+            : isOpen
+              ? "before:bg-nav-pill before:scale-100 before:opacity-100"
+              : "before:bg-nav-pill before:scale-90 before:opacity-0 hover:before:scale-100 hover:before:opacity-100",
         )}
       >
         <Link

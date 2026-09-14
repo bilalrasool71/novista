@@ -88,34 +88,40 @@ export default async function ProductPage({ params }: Props) {
           </>
         }
         aside={
-          <div className="border-line rounded-3xl bg-surface p-6 border sm:p-7">
-            <div className="flex items-start justify-between gap-3">
-              <span className="border-line bg-surface-2 text-accent-2 grid size-12 place-items-center rounded-2xl border">
-                <Icon aria-hidden="true" className="size-6" />
-              </span>
-              <Badge tone={product.status === "Available" ? "positive" : "accent"}>
-                {product.status}
-              </Badge>
+          <div className="border-line card-elev overflow-hidden rounded-3xl border bg-surface">
+            <div className="p-6 sm:p-7">
+              <div className="flex items-start gap-4">
+                <span className="border-line bg-surface-2 text-accent-2 grid size-11 shrink-0 place-items-center rounded-2xl border">
+                  <Icon aria-hidden="true" className="size-5" />
+                </span>
+                <p className="text-ink text-[1.0625rem] leading-snug font-semibold">
+                  {product.tagline}
+                </p>
+                <Badge
+                  className="ml-auto shrink-0"
+                  tone={product.status === "Available" ? "positive" : "accent"}
+                >
+                  {product.status}
+                </Badge>
+              </div>
             </div>
 
-            <p className="text-ink mt-5 text-lg leading-snug font-semibold">
-              {product.tagline}
-            </p>
-
-            <p className="text-muted mt-6 flex items-center gap-2 eyebrow">
-              <Users aria-hidden="true" className="size-3.5" />
-              Built for
-            </p>
-            <ul className="mt-3 flex flex-wrap gap-1.5">
-              {product.audience.map((item) => (
-                <li
-                  key={item}
-                  className="bg-surface-2 text-muted border-line rounded-xl px-3 py-1.5 text-[0.8125rem] font-medium border"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <div className="border-line bg-surface-2 border-t p-6 sm:p-7">
+              <p className="eyebrow text-muted flex items-center gap-2">
+                <Users aria-hidden="true" className="size-3.5" />
+                Built for
+              </p>
+              <ul className="mt-3.5 flex flex-wrap gap-1.5">
+                {product.audience.map((item) => (
+                  <li
+                    key={item}
+                    className="border-line bg-surface text-muted rounded-full border px-3 py-1.5 text-[0.8125rem] font-medium"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         }
       />

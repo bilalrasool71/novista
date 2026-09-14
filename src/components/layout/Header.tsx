@@ -209,6 +209,12 @@ export function Header() {
           </nav>
 
           <div className="hidden items-center gap-1.5 lg:flex">
+            {/* Without this the theme button floats between two dense groups
+                with nothing holding it to either. */}
+            <span
+              aria-hidden="true"
+              className="bg-line mr-1.5 h-6 w-px shrink-0"
+            />
             <ThemeToggle />
             <Button href="/contact" size="sm" variant="primary" withArrow>
               {cta.primary.label}

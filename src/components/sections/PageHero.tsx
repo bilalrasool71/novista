@@ -31,6 +31,15 @@ export function PageHero({
   /** Optional card alongside the heading, used by the detail pages. */
   aside?: React.ReactNode;
 }) {
+  /**
+   * On a detail page the label often repeats the crumb directly above it —
+   * "Web Development" in the breadcrumb, again as the eyebrow, again inside
+   * the h1. Three copies of the same words is not a signpost, it is noise.
+   */
+  const lastCrumb = crumbs.at(-1)?.name.trim().toLowerCase();
+  const showLabel =
+    Boolean(label) && label?.trim().toLowerCase() !== lastCrumb;
+
   const deck = description ? (
     <div
       className={cn(
@@ -58,8 +67,8 @@ export function PageHero({
       <Aurora />
 
       <Container className="relative">
-        <div className="pt-6 pb-16 sm:pb-20 lg:pb-24">
-          <Breadcrumbs crumbs={crumbs} className="mb-10 sm:mb-14" />
+        <div className="pt-6 pb-14 sm:pb-16 lg:pb-20">
+          <Breadcrumbs crumbs={crumbs} className="mb-8 sm:mb-10" />
 
           <div
             className={cn(
@@ -69,7 +78,7 @@ export function PageHero({
             )}
           >
             <div className="lg:col-span-7">
-              {label ? (
+              {showLabel ? (
                 <p className="eyebrow text-accent-2 mb-5 flex items-center gap-3">
                   <span
                     aria-hidden="true"
@@ -79,7 +88,16 @@ export function PageHero({
                 </p>
               ) : null}
 
-              <h1 className="font-display text-ink text-[clamp(2.125rem,3.7vw,3.5rem)] leading-[1.04] font-semibold tracking-[-0.03em]">
+              <h1
+                className={cn(
+                  "font-display text-ink leading-[1.04] font-semibold tracking-[-0.03em]",
+                  // A detail page gives the title seven columns beside a card,
+                  // so it is set a step down from an index page's masthead.
+                  aside
+                    ? "text-[clamp(1.875rem,3vw,2.875rem)]"
+                    : "text-[clamp(2.125rem,3.7vw,3.5rem)]",
+                )}
+              >
                 {title}
               </h1>
 

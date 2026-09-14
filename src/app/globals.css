@@ -55,6 +55,13 @@
   --color-night-muted: #96a9c2;
   --color-night-line: #26344d;
 
+  /* Nav item states.
+     These paint on the header island, which is very close to white, so a
+     neutral like `surface-2` lands at 1.10 against it and the nav looks
+     inert. A brand wash reads clearly and ties the state to the brand. */
+  --color-nav-pill: #e0effa;
+  --color-nav-pill-active: #cbe5f7;
+
   /* Aurora light. Always lighter than the ground it sits on, so it reads
      as light rather than as a smudge. */
   --color-aurora-1: #6fd3f5;
@@ -123,6 +130,9 @@
 
   --color-accent: #4fb2ee;
   --color-accent-2: #6cc4f2;
+
+  --color-nav-pill: #1a334a;
+  --color-nav-pill-active: #234967;
 
   --color-night: #0b1120;
   --color-aurora-1: #2e77c9;
